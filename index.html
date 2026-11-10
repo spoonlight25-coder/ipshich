@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ИПшич — калькулятор налогов ИП, PDF-инструменты и инструкции</title>
+<meta name="description" content="Калькулятор налогов и взносов ИП на 2026 год, бесплатные PDF-инструменты в браузере и пошаговая инструкция, как открыть ИП и выбрать банк.">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --soft:#f6f6fb; --soft2:#efeefa;
+  --ink:#0f1222; --muted:#62677a; --line:#e8e8f0;
+  --acc:#5b4bff; --acc2:#8b7bff; --acc-soft:#efedff;
+  --ok:#14b8a6; --ok-soft:#e6f8f5;
+  --warn:#fff7e6; --warn-line:#f4dfb0;
+  --r:22px; --shadow:0 20px 50px -20px rgba(40,30,120,.18), 0 4px 14px -6px rgba(40,30,120,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.12;margin:0}
+h2{font-size:clamp(28px,4.2vw,44px);font-weight:800}
+.sub{color:var(--muted);font-size:18px;max-width:620px;margin:14px 0 0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--acc);background:var(--acc-soft);padding:6px 12px;border-radius:999px}
+section{padding:96px 0;position:relative}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+
+/* ---------- фон: мягкие пятна ---------- */
+.blobs{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;animation:float 18s ease-in-out infinite}
+.b1{width:520px;height:520px;background:#e4e0ff;top:-160px;right:-120px}
+.b2{width:420px;height:420px;background:#dff6f2;bottom:-120px;left:-140px;animation-delay:-6s}
+.b3{width:300px;height:300px;background:#ffe9f3;top:40%;left:40%;animation-delay:-11s;opacity:.4}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-25px) scale(1.06)}}
+
+/* ---------- шапка ---------- */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.72);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.nav.scrolled{border-color:var(--line);box-shadow:0 6px 24px -18px rgba(20,20,60,.25)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;text-decoration:none}
+.logo i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;color:#fff;font-style:normal;font-size:17px;box-shadow:0 6px 16px -6px var(--acc)}
+.menu{display:flex;gap:30px}
+.menu a{text-decoration:none;color:var(--muted);font-weight:600;font-size:15px;transition:color .2s}
+.menu a:hover{color:var(--ink)}
+@media(max-width:860px){.menu{display:none}}
+
+/* ---------- кнопки ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;font:inherit;font-weight:700;text-decoration:none;padding:15px 24px;border-radius:14px;transition:transform .2s,box-shadow .2s,background .2s}
+.btn.main{background:linear-gradient(135deg,var(--acc),#7a5cff);color:#fff;box-shadow:0 14px 30px -12px rgba(91,75,255,.65)}
+.btn.main:hover{transform:translateY(-2px);box-shadow:0 18px 36px -12px rgba(91,75,255,.75)}
+.btn.main .arr{transition:transform .2s}.btn.main:hover .arr{transform:translateX(4px)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn.sm{padding:10px 18px;font-size:14px;border-radius:12px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* ---------- первый экран ---------- */
+.hero{padding:70px 0 90px}
+.hgrid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+.hgrid>*{min-width:0}
+@media(max-width:960px){.hgrid{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(40px,6.4vw,72px);font-weight:800;margin:18px 0 0}
+.grad{background:linear-gradient(100deg,var(--acc) 10%,#b15cff 55%,var(--acc) 90%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.ticks{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;color:var(--muted);font-size:14px;font-weight:600}
+.ticks span{display:inline-flex;align-items:center;gap:7px}
+.ticks span::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--ok-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2314b8a6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/11px no-repeat}
+
+/* телефон с «приложением» */
+.stage{position:relative;height:560px;display:grid;place-items:center}
+.phone{width:290px;height:560px;border-radius:44px;background:#fff;border:10px solid #14152a;box-shadow:0 50px 90px -30px rgba(40,30,120,.35);position:relative;overflow:hidden;animation:bob 7s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-12px) rotate(-.5deg)}}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:26px;background:#14152a;border-radius:20px;z-index:2}
+.app{padding:52px 18px 18px;height:100%;background:linear-gradient(180deg,#f7f6ff 0%,#fff 40%)}
+.app .t{font-weight:800;font-size:19px}
+.app .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.prog{height:8px;background:var(--soft2);border-radius:9px;margin:16px 0 18px;overflow:hidden}
+.prog b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#b15cff);border-radius:9px;animation:fill 9s ease-in-out infinite}
+@keyframes fill{0%{width:6%}20%{width:30%}40%{width:52%}60%{width:76%}75%,100%{width:100%}}
+.st{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:14px;background:#fff;border:1px solid var(--line);margin-bottom:9px;font-size:13.5px;font-weight:600}
+.st .c{width:24px;height:24px;border-radius:50%;flex:none;border:2px solid var(--line);display:grid;place-items:center;transition:all .3s}
+.st .c svg{width:12px;opacity:0}
+.st.on .c{background:var(--ok);border-color:var(--ok)}
+.st.on .c svg{opacity:1}
+.st small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.done{margin-top:12px;padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--acc),#8a5cff);color:#fff;font-weight:700;font-size:14px;text-align:center;opacity:0;transform:translateY(8px);transition:all .5s}
+.done.show{opacity:1;transform:none}
+.chip{position:absolute;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 15px;box-shadow:var(--shadow);font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;animation:bob2 6s ease-in-out infinite}
+.chip .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px}
+.chip small{display:block;color:var(--muted);font-weight:600;font-size:11.5px}
+.c1{left:0;top:34%}.c1 .ic{background:var(--ok-soft)}
+.c2{right:0;top:58%;animation-delay:-2s}.c2 .ic{background:var(--acc-soft)}
+.c3{left:0;bottom:2%;animation-delay:-4s}.c3 .ic{background:#fff1e6}
+@keyframes bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media(max-width:1100px) and (min-width:961px){.chip{display:none}}
+@media(max-width:620px){.c2,.c3{display:none}.c1{top:auto;bottom:-6px;left:50%;margin-left:-80px}.stage{height:600px}}
+
+/* полоса доверия */
+.trust{position:relative;z-index:1;margin-top:60px;text-align:center}
+.trust p{color:var(--muted);font-size:14px;font-weight:600;margin:0 0 16px}
+.marquee{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.track{display:flex;gap:14px;width:max-content;animation:scroll 32s linear infinite}
+.pill{white-space:nowrap;padding:12px 20px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:700;color:#3a3e52;font-size:15px}
+.pill em{font-style:normal;color:var(--muted);font-weight:600}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- общие карточки ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px;transition:transform .3s,box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#dcdaf5}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:44px}
+@media(max-width:900px){.grid3,.grid2{grid-template-columns:1fr}}
+
+/* ---------- выбор задачи ---------- */
+.bg-soft{background:var(--soft)}
+.tabs{display:inline-flex;gap:6px;background:#fff;border:1px solid var(--line);padding:6px;border-radius:16px;margin-top:34px;flex-wrap:wrap;justify-content:center}
+.tab{border:0;background:transparent;font:inherit;font-weight:700;color:var(--muted);padding:11px 18px;border-radius:11px;cursor:pointer;transition:all .25s}
+.tab.on{background:var(--ink);color:#fff}
+.panel{max-width:820px;margin:26px auto 0;text-align:left}
+.panel .card{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;animation:pop .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.emoji{width:64px;height:64px;border-radius:20px;background:var(--acc-soft);display:grid;place-items:center;font-size:30px}
+.panel h3{font-size:22px;margin-bottom:8px}
+.panel ul{margin:10px 0 0;padding:0;list-style:none}
+.panel li{padding:7px 0 7px 34px;position:relative;color:#30344a}
+.panel li::before{content:"";position:absolute;left:0;top:12px;width:16px;height:16px;border-radius:50%;background:var(--acc-soft);border:4px solid #fff;box-shadow:0 0 0 1.5px var(--acc)}
+@media(max-width:600px){.panel .card{grid-template-columns:1fr}}
+
+/* ---------- шаги ---------- */
+.steps{position:relative;max-width:760px;margin:50px auto 0}
+.steps::before{content:"";position:absolute;left:27px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.line{position:absolute;left:27px;top:10px;width:2px;height:0;background:linear-gradient(var(--acc),#b15cff);transition:height .15s linear}
+.step{position:relative;padding:0 0 34px 82px}
+.step .n{position:absolute;left:0;top:0;width:56px;height:56px;border-radius:18px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:19px;color:var(--muted);transition:all .4s}
+.step.lit .n{background:linear-gradient(135deg,var(--acc),#8a5cff);color:#fff;border-color:transparent;box-shadow:0 12px 26px -12px var(--acc)}
+.step h3{font-size:20px;margin:4px 0 6px}
+.step p{margin:0;color:var(--muted)}
+.step .tip{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--acc);background:var(--acc-soft);padding:5px 11px;border-radius:9px}
+
+/* ---------- банки ---------- */
+.bank{display:flex;flex-direction:column;position:relative;overflow:hidden}
+.bank .top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.bank .mono{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:18px}
+.bank h3{font-size:20px}
+.bank .tg{font-size:12.5px;font-weight:700;color:var(--muted)}
+.bank ul{list-style:none;padding:0;margin:0 0 18px;flex:1}
+.bank li{padding:8px 0 8px 26px;position:relative;font-size:15px;border-bottom:1px dashed var(--line)}
+.bank li:last-child{border:0}
+.bank li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
+.bank .terms{font-size:13px;color:var(--muted);background:var(--soft);border-radius:14px;padding:12px 14px;margin-bottom:16px}
+.bank .soon{position:absolute;top:18px;right:18px;font-size:11.5px;font-weight:800;color:var(--muted);background:var(--soft);padding:4px 10px;border-radius:999px}
+.bank.off{opacity:.62}
+.bank.off:hover{transform:none;box-shadow:none}
+.erid{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.45}
+.bank .more{display:block;text-align:center;margin-top:10px;font-size:14px;font-weight:700;color:var(--acc);text-decoration:none}
+.bank .more:hover{text-decoration:underline}
+.note{margin-top:22px;font-size:14px;color:var(--muted);text-align:center}
+
+/* ---------- ИП или самозанятость ---------- */
+.vs .card h3{font-size:22px;display:flex;align-items:center;gap:10px}
+.vs .badge{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
+.vs .row{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.vs .row:last-child{border:0}
+.vs .row span:first-child{color:var(--muted)}
+.vs .row span:last-child{font-weight:700;text-align:right}
+.warnbox{max-width:820px;margin:28px auto 0;background:var(--warn);border:1px solid var(--warn-line);border-radius:18px;padding:18px 22px;font-size:15px;display:flex;gap:14px}
+.warnbox b{display:block;margin-bottom:2px}
+
+/* ---------- вопросы ---------- */
+.faq{max-width:820px;margin:44px auto 0}
+.q{border:1px solid var(--line);border-radius:18px;margin-bottom:12px;background:#fff;transition:box-shadow .3s}
+.q.open{box-shadow:var(--shadow)}
+.q button{all:unset;box-sizing:border-box;width:100%;cursor:pointer;padding:20px 22px;font-weight:700;font-size:17px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.q .pl{width:30px;height:30px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex:none;transition:transform .35s,background .3s}
+.q.open .pl{transform:rotate(45deg);background:var(--acc-soft);color:var(--acc)}
+.q .a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s ease}
+.q.open .a{grid-template-rows:1fr}
+.q .a>div{overflow:hidden}
+.q .a p{margin:0;padding:0 22px 20px;color:var(--muted)}
+
+/* ---------- финальный призыв ---------- */
+.final{padding:40px 0 100px}
+.final .box{position:relative;overflow:hidden;border-radius:32px;padding:64px 40px;text-align:center;background:linear-gradient(135deg,#5b4bff,#8a5cff 60%,#b15cff);color:#fff}
+.final .box::before,.final .box::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.12)}
+.final .box::before{width:340px;height:340px;top:-140px;left:-100px;animation:float 14s ease-in-out infinite}
+.final .box::after{width:260px;height:260px;bottom:-120px;right:-60px;animation:float 16s ease-in-out infinite reverse}
+.final h2{position:relative}
+.final p{position:relative;opacity:.9;font-size:18px;max-width:560px;margin:14px auto 28px}
+.final .btn{position:relative;background:#fff;color:var(--acc);box-shadow:0 14px 30px -12px rgba(0,0,0,.35)}
+.final .btn:hover{transform:translateY(-2px)}
+
+/* ---------- подвал ---------- */
+footer{border-top:1px solid var(--line);padding:40px 0 50px;color:var(--muted);font-size:14px}
+footer .wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:30px}
+footer p{margin:0 0 10px}
+@media(max-width:800px){footer .wrap{grid-template-columns:1fr}}
+
+/* ---------- калькулятор ---------- */
+.seg{display:inline-flex;gap:4px;background:var(--soft);border:1px solid var(--line);padding:5px;border-radius:14px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--muted);padding:9px 14px;border-radius:10px;cursor:pointer;transition:all .2s}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 10px -4px rgba(20,20,60,.2)}
+.ctabs{display:flex;justify-content:center;margin-top:30px}
+.ctabs .seg{background:#fff}
+.ctabs .seg button{font-size:15px;padding:11px 18px}
+.ctabs .seg button.on{background:var(--ink);color:#fff}
+.calc{display:grid;grid-template-columns:1fr 1.05fr;gap:22px;margin-top:26px;text-align:left;align-items:start}
+.calc>*{min-width:0}
+@media(max-width:900px){.calc{grid-template-columns:1fr}}
+.cpane{display:none}.cpane.on{display:grid;animation:pop .45s cubic-bezier(.2,.8,.2,1)}
+.form .fld{margin-bottom:18px}
+.form label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+.form label small{font-weight:600;color:var(--muted)}
+.inp{position:relative}
+.inp input[type=text],.inp input[type=date]{width:100%;font:inherit;font-weight:700;font-size:20px;padding:14px 46px 14px 16px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s}
+.inp input[type=date]{font-size:16px;padding-right:16px}
+.inp input:focus{border-color:var(--acc);box-shadow:0 0 0 4px var(--acc-soft)}
+.inp .u{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700}
+.range{display:flex;align-items:center;gap:14px}
+.range input{flex:1;accent-color:var(--acc)}
+.range b{min-width:52px;text-align:right}
+.chk{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;color:#30344a;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--acc)}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+.example{all:unset;cursor:pointer;font-size:13.5px;font-weight:700;color:var(--acc);display:inline-flex;gap:6px;margin-bottom:16px}
+.receipts{display:grid;gap:14px;align-content:start}
+.rcpt{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 22px 26px;position:relative;transition:transform .3s,box-shadow .3s,border-color .3s,opacity .3s}
+.rcpt::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:10px;background:radial-gradient(circle at 7px 10px,#fff 5.5px,transparent 6px) repeat-x;background-size:14px 10px}
+.rcpt.best{border-color:var(--acc);box-shadow:0 18px 40px -22px rgba(91,75,255,.6)}
+.rcpt.na{opacity:.55}
+.rcpt h4{margin:0 0 6px;font-size:17px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rcpt .tag{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--acc-soft);color:var(--acc);white-space:nowrap}
+.rcpt .tag.bad{background:#fdecec;color:#c0392b}
+.rcpt .ln{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.rcpt .ln span:first-child{color:var(--muted)}
+.rcpt .ln span:last-child{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.rcpt .tot{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;font-weight:800}
+.rcpt .tot b{font-size:26px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.rcpt .per{font-size:13px;color:var(--muted);text-align:right;margin-top:2px}
+.rcpt .warn{font-size:13px;color:#8a5a00;background:var(--warn);border-radius:10px;padding:8px 12px;margin-top:10px}
+.copy{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;gap:6px;align-items:center;margin-top:12px}
+.copy:hover{color:var(--acc)}
+.bump{animation:bump .35s ease}
+@keyframes bump{50%{transform:scale(1.03)}}
+.calc-note{font-size:13px;color:var(--muted);margin-top:18px;line-height:1.55}
+.adv{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--acc-soft);border-radius:16px;padding:14px 18px;font-size:14px;font-weight:600}
+.adv a{font-weight:800;color:var(--acc);text-decoration:none;white-space:nowrap}
+
+/* ---------- PDF ---------- */
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+@media(max-width:900px){.tools{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.tools{grid-template-columns:1fr}}
+.tool{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;gap:16px;align-items:flex-start;transition:transform .25s,box-shadow .25s,border-color .25s;text-align:left}
+.tool:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#dcdaf5}
+.tool.on{border-color:var(--acc);box-shadow:0 0 0 4px var(--acc-soft)}
+.tool .ti{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:23px;flex:none}
+.tool b{display:block;font-size:16.5px;margin-bottom:3px}
+.tool span{font-size:13.5px;color:var(--muted);line-height:1.45}
+.work{margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow);text-align:left;animation:pop .45s cubic-bezier(.2,.8,.2,1)}
+.work h3{font-size:22px;margin-bottom:4px}
+.work .sub2{color:var(--muted);margin:0}
+.drop{display:block;margin-top:18px;border:2px dashed #d6d3f7;border-radius:18px;padding:34px 20px;text-align:center;background:var(--soft);transition:all .2s;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-soft)}
+.drop .big{font-size:34px}
+.drop b{display:block;font-size:17px;margin:6px 0 4px}
+.drop span{font-size:14px;color:var(--muted)}
+.files{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px}
+.files li{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:14px;animation:pop .3s ease;background:#fff}
+.files li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.files li .sz{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.files li button{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--soft);font-size:13px;flex:none}
+.files li button:hover{background:var(--acc-soft)}
+.opts{display:flex;flex-wrap:wrap;gap:16px 26px;margin-top:18px;align-items:flex-end}
+.opts label.t{display:block;font-weight:700;font-size:13px;margin-bottom:7px;color:#30344a}
+.opts input[type=text]{font:inherit;font-weight:600;padding:10px 12px;border:1.5px solid var(--line);border-radius:11px;outline:none;width:220px;max-width:100%}
+.opts input[type=text]:focus{border-color:var(--acc)}
+.run{display:flex;align-items:center;gap:14px;margin-top:22px;flex-wrap:wrap}
+.status{font-size:14px;font-weight:600;color:var(--muted)}
+.status.ok{color:#0f8f80}.status.err{color:#c0392b}
+.privacy{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-size:13.5px;font-weight:700;color:#0f8f80;background:var(--ok-soft);padding:8px 14px;border-radius:11px}
+
+/* ---------- связь ---------- */
+.contact{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:28px;padding:30px 34px;box-shadow:var(--shadow)}
+@media(max-width:760px){.contact{grid-template-columns:1fr;text-align:center;justify-items:center}}
+.tgi{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#2aabee,#229ed9);display:grid;place-items:center;box-shadow:0 14px 30px -14px #229ed9}
+.contact h3{font-size:24px;margin-bottom:6px}
+.contact p{margin:0;color:var(--muted)}
+.btn.tg{background:linear-gradient(135deg,#2aabee,#229ed9);color:#fff;box-shadow:0 14px 30px -12px rgba(34,158,217,.6)}
+.btn.tg:hover{transform:translateY(-2px)}
+.fab{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;align-items:center;gap:10px;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 16px 7px 7px;box-shadow:0 16px 40px -16px rgba(20,20,60,.35);font-weight:700;font-size:14px;transform:translateY(130px);transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.fab.show{transform:none}
+.fab i{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2aabee,#229ed9);display:grid;place-items:center}
+.fab:hover{box-shadow:0 18px 44px -14px rgba(34,158,217,.6)}
+@media(max-width:560px){.fab span{display:none}.fab{padding:7px}}
+
+/* ---------- появление при прокрутке ---------- */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- 1. Логотип и навигация -->
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top"><i>И</i>ИПшич</a>
+    <div class="menu">
+      <a href="#calc">Калькулятор</a>
+      <a href="#pdf">PDF-инструменты</a>
+      <a href="#steps">Как открыть ИП</a>
+      <a href="#banks">Банки</a>
+      <a href="#faq">Вопросы</a>
+      <a href="#contact">Связь</a>
+    </div>
+    <a class="btn main sm" href="#banks">Выбрать банк</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="wrap hgrid">
+    <div>
+      <span class="eyebrow rv">✦ Бесплатная пошаговая инструкция</span>
+      <!-- 2. Чёткий заголовок -->
+      <h1 class="rv d1">Своё дело —<br><span class="grad">за один день</span></h1>
+      <!-- 3. Короткое пояснение -->
+      <p class="sub rv d2">Покажем, как открыть ИП с телефона без госпошлины и похода в налоговую, и поможем выбрать банк под твою задачу. Без звонков, без воды и мелкого шрифта.</p>
+      <!-- 4. Основной призыв -->
+      <div class="cta rv d3">
+        <a class="btn main" href="#banks">Подобрать банк <span class="arr">→</span></a>
+        <a class="btn ghost" href="#calc">🧮 Посчитать налог</a>
+      </div>
+      <div class="ticks rv d4"><span>Госпошлина 0 ₽</span><span>Всё с телефона</span><span>Без похода в налоговую</span></div>
+    </div>
+
+    <!-- 5. Визуал продукта -->
+    <div class="stage rv d2">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="app">
+          <div class="t">Регистрация ИП</div>
+          <div class="s">Заявка через банк · онлайн</div>
+          <div class="prog"><b></b></div>
+          <div class="st" data-i="0"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><div>Паспорт и телефон<small>данные заполнены</small></div></div>
+          <div class="st" data-i="1"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><div>Вид деятельности<small>коды ОКВЭД выбраны</small></div></div>
+          <div class="st" data-i="2"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><div>Система налогов<small>УСН «Доходы»</small></div></div>
+          <div class="st" data-i="3"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><div>Электронная подпись<small>документы подписаны</small></div></div>
+          <div class="st" data-i="4"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><div>Расчётный счёт<small>реквизиты готовы</small></div></div>
+          <div class="done" id="done">🎉 Ты — индивидуальный предприниматель</div>
+        </div>
+      </div>
+      <div class="chip c1"><span class="ic">🧾</span><div>Госпошлина<small>0 ₽ через банк</small></div></div>
+      <div class="chip c2"><span class="ic">📱</span><div>Всё онлайн<small>с телефона</small></div></div>
+      <div class="chip c3"><span class="ic">⏱</span><div>1–3 рабочих дня<small>обычно на документы</small></div></div>
+    </div>
+  </div>
+
+  <!-- 6. Доверительный элемент -->
+  <div class="trust wrap rv">
+    <p>Сравниваем только публичные условия банков — без рейтингов «за деньги»</p>
+    <div class="marquee"><div class="track" id="track"></div></div>
+  </div>
+</header>
+
+<!-- Кому подходит -->
+<section class="bg-soft center" id="who">
+  <div class="wrap">
+    <span class="eyebrow rv">Шаг 0</span>
+    <h2 class="rv d1" style="margin-top:14px">Что ты хочешь делать?</h2>
+    <p class="sub rv d2">Выбери вариант — покажем, на что обратить внимание именно тебе.</p>
+    <div class="tabs rv d3" id="tabs"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+</section>
+
+<!-- Калькулятор -->
+<section id="calc">
+  <div class="wrap center">
+    <span class="eyebrow rv">Калькулятор · правила 2026</span>
+    <h2 class="rv d1" style="margin-top:14px">Сколько ты заплатишь государству</h2>
+    <p class="sub rv d2">Введи свои цифры — результат пересчитывается сразу. Без регистрации и без отправки данных.</p>
+    <div class="ctabs rv d3"><div class="seg" id="ctabs">
+      <button class="on" data-p="cmp">⚖️ Что выгоднее</button>
+      <button data-p="vz">🧾 Взносы ИП</button>
+      <button data-p="nds">🧮 НДС</button>
+    </div></div>
+
+    <!-- 1. сравнение режимов -->
+    <div class="calc cpane on" id="p-cmp">
+      <div class="card form">
+        <button class="example" data-ex="cmp">✨ Пример — подставить цифры</button>
+        <div class="fld"><label>Доход за год</label><div class="inp"><input type="text" inputmode="numeric" id="c-inc" value="1 200 000"><span class="u">₽</span></div></div>
+        <div class="fld"><label>Расходы за год <small>— закупка, аренда, реклама (для УСН 15%)</small></label><div class="inp"><input type="text" inputmode="numeric" id="c-exp" value="300 000"><span class="u">₽</span></div></div>
+        <div class="fld"><label>Сколько дохода от компаний и ИП <small>— важно для самозанятости</small></label>
+          <div class="range"><input type="range" min="0" max="100" step="5" value="0" id="c-b2b"><b id="c-b2b-v">0%</b></div>
+          <div class="hint">Остальное — оплаты от обычных людей (физлиц).</div></div>
+        <label class="chk"><input type="checkbox" id="c-bonus" checked> Учесть стартовый бонус самозанятого 10 000 ₽ (первый год)</label>
+        <p class="calc-note">Считаем для ИП без сотрудников, на полный 2026 год. Взносы: 57 390 ₽ + 1% с дохода свыше 300 000 ₽ (максимум 321 818 ₽). На УСН 6% налог уменьшается на взносы до нуля; на УСН 15% — минимальный налог 1% от дохода. Региональные пониженные ставки не учтены.</p>
+      </div>
+      <div class="receipts" id="c-out"></div>
+    </div>
+
+    <!-- 2. взносы -->
+    <div class="calc cpane" id="p-vz">
+      <div class="card form">
+        <button class="example" data-ex="vz">✨ Пример — ИП открыт 15 марта</button>
+        <div class="fld"><label>Система налогов</label><div class="seg" id="v-mode"><button class="on" data-v="inc">Доходы (УСН 6%, патент)</button><button data-v="net">Доходы минус расходы</button></div></div>
+        <div class="fld"><label>Доход за 2026 год</label><div class="inp"><input type="text" inputmode="numeric" id="v-inc" value="1 000 000"><span class="u">₽</span></div></div>
+        <div class="fld" id="v-exp-f" style="display:none"><label>Расходы за 2026 год</label><div class="inp"><input type="text" inputmode="numeric" id="v-exp" value="0"><span class="u">₽</span></div></div>
+        <div class="fld"><label>Дата регистрации ИП <small>— пусто, если открыт до 2026 года</small></label><div class="inp"><input type="date" id="v-from" min="2026-01-01" max="2026-12-31"></div></div>
+        <div class="fld"><label>Дата закрытия ИП <small>— пусто, если работаешь до конца года</small></label><div class="inp"><input type="date" id="v-to" min="2026-01-01" max="2026-12-31"></div></div>
+      </div>
+      <div class="receipts" id="v-out"></div>
+    </div>
+
+    <!-- 3. НДС -->
+    <div class="calc cpane" id="p-nds">
+      <div class="card form">
+        <div class="fld"><label>Что сделать</label><div class="seg" id="n-mode"><button class="on" data-v="add">Начислить НДС</button><button data-v="sub">Выделить НДС</button></div></div>
+        <div class="fld"><label id="n-lab">Сумма без НДС</label><div class="inp"><input type="text" inputmode="decimal" id="n-sum" value="100 000"><span class="u">₽</span></div></div>
+        <div class="fld"><label>Ставка</label><div class="seg" id="n-rate"><button class="on" data-v="22">22%</button><button data-v="10">10%</button><button data-v="7">7%</button><button data-v="5">5%</button><button data-v="0">0%</button></div>
+          <div class="hint">22% — основная с 2026 года. 5% и 7% — пониженные для УСН с доходом больше 20 млн ₽.</div></div>
+      </div>
+      <div class="receipts" id="n-out"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Шаги -->
+<section class="bg-soft" id="steps">
+  <div class="wrap center">
+    <span class="eyebrow rv">Пошагово</span>
+    <h2 class="rv d1" style="margin-top:14px">Как открыть ИП за один день</h2>
+    <p class="sub rv d2">Пять шагов. Самое сложное — первые два, дальше всё делает банк.</p>
+  </div>
+  <div class="wrap">
+    <div class="steps" id="stepsBox"><div class="line" id="line"></div></div>
+  </div>
+</section>
+
+<!-- Банки -->
+<section id="banks">
+  <div class="wrap center">
+    <span class="eyebrow rv">Сравнение</span>
+    <h2 class="rv d1" style="margin-top:14px">Где открыть ИП и счёт</h2>
+    <p class="sub rv d2">Только то, что банки пишут в своих предложениях. Перед оформлением сверяй условия на сайте банка — они меняются.</p>
+  </div>
+  <div class="wrap"><div class="grid3" id="bankGrid"></div>
+    <p class="note rv">Ссылки на банки партнёрские: если откроешь счёт по ним, банк заплатит нам вознаграждение. Для тебя условия те же.</p>
+  </div>
+</section>
+
+<!-- ИП или самозанятость -->
+<section class="vs bg-soft" id="vs">
+  <div class="wrap center">
+    <span class="eyebrow rv">Честно</span>
+    <h2 class="rv d1" style="margin-top:14px">ИП или самозанятость?</h2>
+    <p class="sub rv d2">ИП нужен не всем. Если тебе хватает самозанятости — оставайся на ней, это проще.</p>
+  </div>
+  <div class="wrap">
+    <div class="grid2">
+      <div class="card rv d1">
+        <h3>Самозанятость <span class="badge" style="background:var(--ok-soft);color:#0f8f80">проще</span></h3>
+        <div style="margin-top:14px">
+          <div class="row"><span>Налог</span><span>4% с физлиц, 6% с компаний</span></div>
+          <div class="row"><span>Взносы</span><span>не обязательны</span></div>
+          <div class="row"><span>Лимит дохода</span><span>2,4 млн ₽ в год</span></div>
+          <div class="row"><span>Сотрудники</span><span>нельзя</span></div>
+          <div class="row"><span>Перепродажа чужих товаров</span><span>нельзя</span></div>
+        </div>
+      </div>
+      <div class="card rv d2">
+        <h3>ИП <span class="badge" style="background:var(--acc-soft);color:var(--acc)">больше свободы</span></h3>
+        <div style="margin-top:14px">
+          <div class="row"><span>Налог</span><span>например, УСН 6% с дохода</span></div>
+          <div class="row"><span>Взносы</span><span>обязательны, даже без дохода</span></div>
+          <div class="row"><span>Лимит дохода</span><span>намного выше</span></div>
+          <div class="row"><span>Сотрудники</span><span>можно</span></div>
+          <div class="row"><span>Перепродажа товаров</span><span>можно</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="warnbox rv"><span style="font-size:22px">⚠️</span><div><b>Про взносы — сразу и честно</b>У ИП есть обязательные страховые взносы, даже если дохода нет: в 2026 году это 57 390 ₽ плюс 1% с дохода выше 300 тыс. ₽. Посчитать точно — в <a href="#calc" style="color:inherit;font-weight:700">калькуляторе выше</a>. Если бизнес пока не приносит денег — подумай, не рано ли.</div></div>
+  </div>
+</section>
+
+<!-- PDF -->
+<section id="pdf">
+  <div class="wrap center">
+    <span class="eyebrow rv">Бесплатно · прямо в браузере</span>
+    <h2 class="rv d1" style="margin-top:14px">PDF-инструменты</h2>
+    <p class="sub rv d2">Собрать сканы в один файл, сделать PDF из фото, вытащить нужные страницы. Файлы не загружаются на сервер — всё делается на твоём устройстве.</p>
+    <div class="tools" id="tools"></div>
+    <div id="work"></div>
+  </div>
+</section>
+
+<!-- Вопросы -->
+<section class="bg-soft" id="faq">
+  <div class="wrap center">
+    <span class="eyebrow rv">FAQ</span>
+    <h2 class="rv d1" style="margin-top:14px">Частые вопросы</h2>
+  </div>
+  <div class="wrap"><div class="faq" id="faqBox"></div></div>
+</section>
+
+<!-- Связь -->
+<section id="contact" style="padding:30px 0 40px">
+  <div class="wrap">
+    <div class="contact rv">
+      <div class="tgi"><svg width="34" height="34" viewBox="0 0 24 24" fill="#fff"><path d="M21.4 4.6 2.9 11.7c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.5-1.4zM9.9 14.6l-.4 4 -1.4-4.6 10.4-6.6-8.6 7.2z"/></svg></div>
+      <div>
+        <h3>Остались вопросы?</h3>
+        <p>По вопросам — связь с нами в Telegram. Бот сразу ответит на частые вопросы про ИП, налоги и банки, а если ответа нет — передаст специалисту.</p>
+      </div>
+      <a class="btn tg" href="https://t.me/ipshich_bot" target="_blank" rel="noopener">Написать в Telegram →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Финальный призыв -->
+<section class="final">
+  <div class="wrap">
+    <div class="box rv">
+      <h2>Готов начать своё дело?</h2>
+      <p>Выбери банк, открой ИП с телефона и получи реквизиты. Остальное — уже твой бизнес.</p>
+      <a class="btn" href="#banks">Выбрать банк →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="logo" href="#top" style="margin-bottom:12px"><i>И</i>ИПшич</a>
+      <p>Калькуляторы, PDF-инструменты и простые инструкции для тех, кто открывает своё дело.</p>
+      <p>По вопросам: <a href="https://t.me/ipshich_bot" target="_blank" rel="noopener" style="color:var(--acc);font-weight:700;text-decoration:none">Telegram @ipshich_bot</a></p>
+      <p>© <span id="year"></span></p>
+    </div>
+    <div>
+      <p><b style="color:var(--ink)">Реклама.</b> Сайт ведёт частное лицо (самозанятый). Ссылки на банки — партнёрские: при открытии счёта по ним банк выплачивает вознаграждение. Рекламодатель и идентификатор рекламы (erid) указаны у каждого предложения.</p>
+      <p>Информация на сайте — справочная, не является финансовой или юридической консультацией. Условия банков и налоговые правила меняются; актуальные данные — на сайтах банков и nalog.gov.ru.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   НАСТРОЙКИ. Всё, что меняется, — здесь.
+   links  — кнопки: первая большая, остальные — ссылки поменьше.
+            url — партнёрская ссылка из Пампаду целиком (erid берётся из неё сам).
+   adv    — рекламодатель для пометки «Реклама» (сверь с кабинетом Пампаду)
+   active — false: карточка серая с пометкой «скоро»
+   ========================================================= */
+const BANKS = [
+  { name:"Альфа-Банк", mono:"А", color:"#ef3124", tag:"Регистрация ИП + счёт", active:true,
+    adv:"АО «Альфа-Банк», ИНН 7728168971",
+    links:[
+      {text:"Открыть ИП и счёт", url:"https://trk.ppdu.ru/click?uid=367487&oid=2274&erid=2SDnjeEA46e"},
+      {text:"Уже есть ИП? Открыть только счёт", url:"https://trk.ppdu.ru/click?uid=367487&oid=1030&erid=2SDnjeBPX3q"}
+    ],
+    plus:["Регистрация бизнеса онлайн без госпошлины","Открытие и обслуживание счёта — бесплатно","Онлайн-бухгалтерия: налоги и взносы без бухгалтера","До 5% кэшбэка за бизнес-расходы по карте"],
+    terms:"Новый ИП — открывай счёт в течение 30 дней после регистрации. От 18 лет, гражданство РФ." },
+  { name:"ВТБ", mono:"В", color:"#0a2896", tag:"Регистрация бизнеса + счёт", active:true,
+    adv:"Банк ВТБ (ПАО), ИНН 7702070139",
+    links:[
+      {text:"Открыть ИП в ВТБ", url:"https://trk.ppdu.ru/click?uid=367487&oid=2217&erid=Kra23bNL5"},
+      {text:"Ты в Крыму? Условия для Крыма", url:"https://trk.ppdu.ru/click?uid=367487&oid=2217&erid=Kra23bNL5&landingId=949"}
+    ],
+    plus:["Регистрация без госпошлины и похода в налоговую","Открытие счёта и интернет-банк — бесплатно","Электронная подпись бесплатно","Переводы себе на личный счёт без комиссий"],
+    terms:"Для новых клиентов ВТБ. Нужны паспорт, ИНН и СНИЛС. Бесплатное обслуживание на старте — при условиях тарифа, проверяй на сайте банка." },
+  { name:"Ozon Банк", mono:"O", color:"#005bff", tag:"Регистрация ИП + счёт", active:true,
+    adv:"ООО «ОЗОН Банк»",
+    links:[{text:"Открыть ИП в Ozon Банке", url:"https://trk.ppdu.ru/click?uid=367487&oid=1865&erid=2SDnjbvrFuE"}],
+    plus:["Бесплатная регистрация ИП и ООО","Расчётный счёт на тарифе за 0 ₽","Бесплатная электронная подпись","Бесплатная онлайн-бухгалтерия"],
+    terms:"От 18 лет. Подходит любой бизнес, не только продавцы Ozon." },
+  { name:"Точка", mono:"Т", color:"#7b3ff2", tag:"Счёт для предпринимателей", active:true,
+    adv:"ООО «Банк Точка»",
+    links:[{text:"Открыть счёт в Точке", url:"https://trk.ppdu.ru/click?uid=367487&oid=1102&erid=2SDnjdABGBD"}],
+    plus:["Тариф за 0 ₽ для ИП и компаний","Переводы физлицам без комиссии — в пределах лимита тарифа","Процент на остаток по счёту","Поддержка круглосуточно"],
+    terms:"Для ИП, у которых уже есть регистрация. Условия зависят от тарифа — проверяй на сайте банка." },
+  { name:"Банк «Санкт-Петербург»", mono:"С", color:"#c8102e", tag:"Счёт для бизнеса · СПб", active:true,
+    adv:"ПАО «Банк «Санкт-Петербург»",
+    links:[{text:"Открыть счёт", url:"https://trk.ppdu.ru/click?uid=367487&oid=1316&erid=2SDnjeLA2cx"}],
+    plus:["Бесплатная бизнес-карта","Персональный менеджер"],
+    terms:"Только в городах, где есть банк: Санкт-Петербург и Ленобласть, Москва, Калининград, Новосибирск." }
+];
+
+const WHO = [
+  { key:"mp", label:"🛍 Продавать на маркетплейсах", icon:"🛍", title:"Маркетплейсы (WB, Ozon, Яндекс Маркет)",
+    text:"Для перепродажи товаров самозанятость не подходит — нужен ИП.",
+    list:["Коды ОКВЭД: торговля через интернет (основной) + смежные","Чаще всего выбирают УСН «Доходы»","Маркетплейсу понадобятся реквизиты расчётного счёта","Смотри на комиссию за переводы и снятие — денег будет много мелкими платежами"] },
+  { key:"free", label:"💻 Фриланс и услуги", icon:"💻", title:"Фриланс, дизайн, монтаж, разработка",
+    text:"Если работаешь сам и доход до 2,4 млн ₽ в год — скорее всего, хватит самозанятости.",
+    list:["ИП нужен, если заказчики-компании просят договор с ИП","Или если доход растёт выше лимита самозанятых","Удобно, когда банк сам считает налог","Важно: бесплатные входящие платежи от компаний"] },
+  { key:"shop", label:"☕ Своя точка", icon:"☕", title:"Кофейня, барбершоп, мастерская",
+    text:"Для своей точки с кассой и, возможно, сотрудниками нужен ИП.",
+    list:["Понадобится эквайринг — приём оплаты картами","Онлайн-касса обязательна для приёма денег от покупателей","Если будут сотрудники — зарплатный проект","Сравни тарифы именно на эквайринг, а не только на счёт"] }
+];
+
+const STEPS = [
+  ["Реши, точно ли нужен ИП","Если работаешь один и не перепродаёшь товары, сначала посмотри на самозанятость — сравнение ниже.","2 минуты"],
+  ["Выбери коды деятельности (ОКВЭД)","Один основной и несколько запасных. Это то, чем ты официально будешь заниматься.","15 минут"],
+  ["Выбери систему налогов","Новички чаще берут УСН «Доходы» — 6% с дохода. Сомневаешься — спроси бухгалтера в банке.","10 минут"],
+  ["Подай заявку через банк","Паспорт, телефон, электронная подпись — без госпошлины и похода в налоговую.","около 20 минут"],
+  ["Получи реквизиты и начни работать","Банк открывает расчётный счёт. Первые платежи, налоги и поступления — и ты в деле.","1–3 рабочих дня"]
+];
+
+const FAQ = [
+  ["Правда бесплатно?","Регистрация ИП через банк идёт без госпошлины, а открытие счёта у многих банков стоит 0 ₽. Но налоги и страховые взносы ты платишь сам — банк их не отменяет."],
+  ["Можно открыть ИП, если я студент?","Да, с 18 лет. Только посчитай взносы и проверь, не влияет ли ИП на стипендию и льготы."],
+  ["Что значит «активный счёт»?","Банк считает счёт рабочим, когда по нему идут реальные операции: поступления, платежи, налоги, остаток. Просто открыть и забыть — не то."],
+  ["После заявки звонят из банка — это нормально?","Да, менеджер может позвонить уточнить детали. Если передумал — просто откажись, это ни к чему не обязывает."],
+  ["Можно потом сменить банк?","Можно: открыть счёт в другом банке и закрыть старый. Но придётся поменять реквизиты у маркетплейсов и клиентов, поэтому лучше выбрать сразу."],
+  ["Вы берёте с меня деньги?","Нет. Ссылки на банки партнёрские — если откроешь счёт, вознаграждение платит банк. Для тебя условия такие же."]
+];
+
+/* ---------- полоса доверия ---------- */
+const pills = ["Альфа-Банк","ВТБ","Ozon Банк","Точка","Банк «Санкт-Петербург»","Госпошлина 0 ₽ <em>при регистрации через банк</em>","Только публичные условия","Без звонков от нас","Без платных рейтингов"];
+document.getElementById("track").innerHTML = [...pills,...pills].map(p=>'<span class="pill">'+p+'</span>').join("");
+
+/* ---------- вкладки «что хочешь делать» ---------- */
+const tabs = document.getElementById("tabs"), panel = document.getElementById("panel");
+function showWho(k){
+  const w = WHO.find(x=>x.key===k);
+  [...tabs.children].forEach(b=>b.classList.toggle("on", b.dataset.k===k));
+  panel.innerHTML = '<div class="card"><div class="emoji">'+w.icon+'</div><div><h3>'+w.title+'</h3><p style="margin:0;color:var(--muted)">'+w.text+'</p><ul>'+w.list.map(l=>'<li>'+l+'</li>').join("")+'</ul></div></div>';
+}
+WHO.forEach(w=>{const b=document.createElement("button");b.className="tab";b.dataset.k=w.key;b.textContent=w.label;b.onclick=()=>showWho(w.key);tabs.appendChild(b);});
+showWho("mp");
+
+/* ---------- шаги ---------- */
+const sb = document.getElementById("stepsBox");
+STEPS.forEach((s,i)=>{const d=document.createElement("div");d.className="step rv";d.innerHTML='<div class="n">'+(i+1)+'</div><h3>'+s[0]+'</h3><p>'+s[1]+'</p><span class="tip">⏱ '+s[2]+'</span>';sb.appendChild(d);});
+
+/* ---------- банки ---------- */
+const bg = document.getElementById("bankGrid");
+const eridOf = u => { try { return new URL(u).searchParams.get("erid") || ""; } catch(e){ return ""; } };
+BANKS.forEach((b,i)=>{
+  const links = (b.active && b.links) ? b.links.filter(l=>l.url) : [];
+  const el = document.createElement("div");
+  el.className = "card bank rv d"+(i%3+1) + (b.active?"":" off");
+  const main = links[0], more = links.slice(1);
+  const erids = [...new Set(links.map(l=>eridOf(l.url)).filter(Boolean))];
+  el.innerHTML =
+    (b.active?"":'<span class="soon">скоро</span>') +
+    '<div class="top"><div class="mono" style="background:'+b.color+(b.ink?';color:'+b.ink:'')+'">'+b.mono+'</div><div><h3>'+b.name+'</h3><div class="tg">'+b.tag+'</div></div></div>' +
+    '<ul>'+b.plus.map(p=>'<li>'+p+'</li>').join("")+'</ul>' +
+    '<div class="terms">'+b.terms+'</div>' +
+    (main ? '<a class="btn main" rel="sponsored nofollow noopener" target="_blank" href="'+main.url+'">'+main.text+' <span class="arr">→</span></a>'
+          : '<button class="btn main" disabled>'+(b.active?"Ссылка скоро":"Скоро")+'</button>') +
+    more.map(l=>'<a class="more" rel="sponsored nofollow noopener" target="_blank" href="'+l.url+'">'+l.text+' →</a>').join("") +
+    (erids.length ? '<div class="erid">Реклама. '+(b.adv||b.name)+'. erid: '+erids.join(", ")+'</div>' : '');
+  bg.appendChild(el);
+});
+
+/* ---------- вопросы ---------- */
+const fb = document.getElementById("faqBox");
+FAQ.forEach((f,i)=>{
+  const q=document.createElement("div");q.className="q rv";
+  q.innerHTML='<button>'+f[0]+'<span class="pl">+</span></button><div class="a"><div><p>'+f[1]+'</p></div></div>';
+  q.querySelector("button").onclick=()=>q.classList.toggle("open");
+  fb.appendChild(q);
+});
+
+/* ---------- анимация «приложения» в телефоне ---------- */
+const sts=[...document.querySelectorAll(".st")], done=document.getElementById("done");
+let k=0;
+function tick(){
+  if(k<sts.length){ sts[k].classList.add("on"); k++; if(k===sts.length) done.classList.add("show"); }
+  else { sts.forEach(s=>s.classList.remove("on")); done.classList.remove("show"); k=0; }
+}
+setInterval(tick,1500);
+
+/* ---------- появление при прокрутке ---------- */
+const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+/* ---------- шапка и линия шагов ---------- */
+const nav=document.getElementById("nav"), line=document.getElementById("line"), stepEls=[...document.querySelectorAll(".step")];
+function onScroll(){
+  nav.classList.toggle("scrolled", scrollY>10);
+  const r = sb.getBoundingClientRect(), mid = innerHeight*0.6;
+  const h = Math.max(0, Math.min(r.height-20, mid - r.top));
+  line.style.height = h+"px";
+  stepEls.forEach(s=>s.classList.toggle("lit", s.getBoundingClientRect().top < mid));
+}
+addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* ---------- плавающая кнопка Telegram ---------- */
+const fab=document.getElementById("fab");
+addEventListener("scroll",()=>fab.classList.toggle("show",scrollY>600),{passive:true});
+</script>
+
+<a class="fab" id="fab" href="https://t.me/ipshich_bot" target="_blank" rel="noopener">
+  <i><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21.4 4.6 2.9 11.7c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.5-1.4zM9.9 14.6l-.4 4 -1.4-4.6 10.4-6.6-8.6 7.2z"/></svg></i>
+  <span>Вопрос? Пиши в Telegram</span>
+</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+<script src="js/calc.js" defer></script>
+<script src="js/pdf-tools.js" defer></script>
+</body>
+</html>
